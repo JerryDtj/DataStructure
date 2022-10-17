@@ -1,7 +1,3 @@
-import jdk.nashorn.internal.ir.IfNode;
-
-import javax.swing.tree.TreeNode;
-
 /**
  * bstree 二叉搜索树
  *
@@ -245,37 +241,39 @@ public class BSTree<T extends Comparable<T>> {
         }
     }
 
-    public void insert(T key){
-        BSTreeNode<T> insertNode = new BSTreeNode(key,null,null,null);
-        this.insert(this,insertNode);
+    public void insert(T key) {
+        BSTreeNode<T> insertNode = new BSTreeNode(key, null, null, null);
+        this.insert(this, insertNode);
     }
 
 
-
-    private BSTreeNode<T> remove(BSTree<T> tree,BSTreeNode<T> treeNode){
+    /**
+     * 删除
+     * 实际上是个替换的过程，把要删除的节点替换成真正删除的节点，
+     * 如果有左右节点，那么
+     *
+     * @param tree     树
+     * @param treeNode 树节点
+     * @return {@link BSTreeNode}<{@link T}>
+     */
+    private BSTreeNode<T> remove(BSTree<T> tree, BSTreeNode<T> treeNode) {
         BSTreeNode<T> replaceNode = null;
 
-        if (treeNode.right!=null&&treeNode.left!=null){
+        if (treeNode.right != null && treeNode.left != null) {
             replaceNode = precursor(treeNode);
         }
-        if (treeNode.left!=null){
+        if (treeNode.left != null) {
             replaceNode = treeNode.left;
         }
-        if (treeNode.right!=null){
+        if (treeNode.right != null) {
             replaceNode = treeNode.right;
         }
 
-        if (treeNode.parert!=null){
-            if (treeNode.parert.left == treeNode){
-                treeNode.parert.left = treeNode;
-            }else {
-                treeNode.parert.right = treeNode;
-            }
-        }else {
-            tree.mRoot = replaceNode;
+        if (replaceNode != null) {
+            replaceNode.parert = treeNode.parert;
+        } else {
+            treeNode.parert = null;
         }
-
-
 
 
         return null;
