@@ -9,23 +9,26 @@ public class BSTree<T extends Comparable<T>> {
     private BSTreeNode<T> mRoot;
 
     /**
-     * bstree节点
+     * 前驱:当前节点左子树下最大的节点
      *
-     * @author jerry
-     * @date 2022/10/15
+     * @param treeNode 树节点
+     * @return {@link BSTreeNode}<{@link T}>
      */
-    public class BSTreeNode <T extends Comparable<T>>{
-        private T key;
-        private BSTreeNode parert;
-        private BSTreeNode left;
-        private BSTreeNode right;
-
-        public BSTreeNode(T key, BSTreeNode parert, BSTreeNode left, BSTreeNode right) {
-            this.key = key;
-            this.parert = parert;
-            this.left = left;
-            this.right = right;
+    private BSTreeNode<T> precursor(BSTreeNode<T> treeNode) {
+//        如果有左孩子，那么直接找右孩子即可
+        while (treeNode.left != null) {
+            return this.max(treeNode.left);
         }
+//        如果没有，那么判断当前节点
+//        如果当前节点为右孩子，那么前驱就是就是他的父节点
+//        如果当前节点是父节点的左孩子则 向上寻找一个节点Q 直到Q节点是其父节点P的右孩子 p节点即为前驱节点
+        BSTreeNode<T> p = treeNode.parent;
+        while (p != null && treeNode == p.left) {
+            treeNode = p;
+            p = p.parent;
+        }
+
+        return treeNode;
     }
 
     public static void main(String[] args) {
@@ -149,34 +152,6 @@ public class BSTree<T extends Comparable<T>> {
     }
 
     /**
-     * 前驱:当前节点左子树下最大的节点
-     *
-     *
-     * @param treeNode 树节点
-     * @return {@link BSTreeNode}<{@link T}>
-     */
-    private BSTreeNode<T> precursor(BSTreeNode<T> treeNode){
-//        如果有左孩子，那么直接找右孩子即可
-        while (treeNode.left!=null){
-            return this.max(treeNode.left);
-        }
-//        如果没有，那么判断当前节点
-//        如果当前节点为右孩子，那么前驱就是就是他的父节点
-//        如果当前节点是父节点的左孩子则 向上寻找一个节点Q 直到Q节点是其父节点P的右孩子 p节点即为前驱节点
-        BSTreeNode<T> p = treeNode.parert;
-        while (p!=null&&treeNode == p.left){
-            treeNode = p;
-            p = p.parert;
-        }
-
-        return treeNode;
-    }
-
-    public BSTreeNode<T> precursor(){
-        return this.precursor(mRoot);
-    }
-
-    /**
      * 后驱：当前节点右子树下最小的节点
      *
      * @param treeNode 树节点
@@ -189,33 +164,18 @@ public class BSTree<T extends Comparable<T>> {
         //和前驱类似，如果该节点没有左子树，那么判断其父节点
         //如果当前节点为左孩子，那么父节点就是后驱节点
 //        如果当前节点为父节点的右孩子，那么遍历其父节点，找到一个离当前节点最近的，且父节点具有左孩子的节点。那么该父节点即为当前节点的后驱
-        BSTreeNode<T> p = treeNode.parert;
+        BSTreeNode<T> p = treeNode.parent;
         while (p!=null&&treeNode==p.right){
             treeNode = p;
-            p = p.parert;
+            p = p.parent;
         }
 
         return treeNode;
     }
 
-    public BSTreeNode<T> afterFlooding() {
+    public BSTreeNode<T> precursor() {
         return this.precursor(mRoot);
     }
-
-    public T max() {
-        BSTreeNode<T> treeNode = this.max(mRoot);
-        if (treeNode != null) {
-            return treeNode.key;
-        } else {
-            return null;
-        }
-    }
-
-    public void insert(T key) {
-        BSTreeNode<T> insertNode = new BSTreeNode(key, null, null, null);
-        this.insert(this, insertNode);
-    }
-
 
     /**
      * 删除
@@ -244,21 +204,39 @@ public class BSTree<T extends Comparable<T>> {
 
         //开始替换树节点
         if (deleteNode != null) {
-            childNode.parert = deleteNode.parert;
+            childNode.parent = deleteNode.parent;
         }
 
-        if (deleteNode.parert == null) {
+        if (deleteNode.parent == null) {
             tree.mRoot = childNode;
-        } else if (deleteNode == deleteNode.parert.left) {
-            deleteNode.parert.left = childNode;
+        } else if (deleteNode == deleteNode.parent.left) {
+            deleteNode.parent.left = childNode;
         } else {
-            deleteNode.parert.right = childNode;
+            deleteNode.parent.right = childNode;
         }
 
         if (treeNode != deleteNode) {
             treeNode.key = deleteNode.key;
         }
         return deleteNode;
+    }
+
+    public BSTreeNode<T> afterFlooding() {
+        return this.precursor(mRoot);
+    }
+
+    public T max() {
+        BSTreeNode<T> treeNode = this.max(mRoot);
+        if (treeNode != null) {
+            return treeNode.key;
+        } else {
+            return null;
+        }
+    }
+
+    public void insert(T key) {
+        BSTreeNode<T> insertNode = new BSTreeNode(key, null, null, null);
+        this.insert(this, insertNode);
     }
 
     /**
@@ -283,7 +261,7 @@ public class BSTree<T extends Comparable<T>> {
             }
         }
 
-        insertNode.parert = tempNode;
+        insertNode.parent = tempNode;
         //插入
         if (tempNode == null) {
             bsTree.mRoot = insertNode;
@@ -307,10 +285,30 @@ public class BSTree<T extends Comparable<T>> {
             if (direction == 0) {
                 System.out.println(String.format("%s is root", treeNode.key));
             } else {
-                System.out.println(String.format("%s is %s's %s child", treeNode.key, treeNode.parert.key, direction == 1 ? "right" : "left"));
+                System.out.println(String.format("%s is %s's %s child", treeNode.key, treeNode.parent.key, direction == 1 ? "right" : "left"));
             }
             print(treeNode.left, -1);
             print(treeNode.right, 1);
+        }
+    }
+
+    /**
+     * bstree节点
+     *
+     * @author jerry
+     * @date 2022/10/15
+     */
+    public class BSTreeNode<T extends Comparable<T>> {
+        private T key;
+        private BSTreeNode parent;
+        private BSTreeNode left;
+        private BSTreeNode right;
+
+        public BSTreeNode(T key, BSTreeNode parent, BSTreeNode left, BSTreeNode right) {
+            this.key = key;
+            this.parent = parent;
+            this.left = left;
+            this.right = right;
         }
     }
 
