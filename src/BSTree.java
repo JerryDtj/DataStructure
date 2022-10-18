@@ -6,7 +6,7 @@
  */
 public class BSTree<T extends Comparable<T>> {
 
-    private BSTreeNode mRoot;
+    private BSTreeNode<T> mRoot;
 
     /**
      * bstree节点
@@ -249,45 +249,99 @@ public class BSTree<T extends Comparable<T>> {
 
     /**
      * 删除
-     * 实际上是个替换的过程，把要删除的节点替换成真正删除的节点，
-     *
+     * 如果有左右子树，那么删除实际上是个替换的过程，需要把前驱/后继节点替换到要删除的节点上。然后删除前驱或者后继节点
+     * 如果只有左/右子树，那么需要把左/右子树的孩子节点，连接到删除节点的父节点，然后删除该节点
+     * 如果没有子节点，那么直接删除就好
      *
      * @param tree     树
      * @param treeNode 树节点
      * @return {@link BSTreeNode}<{@link T}>
      */
     private BSTreeNode<T> remove(BSTree<T> tree, BSTreeNode<T> treeNode) {
-        BSTreeNode<T> delNode = null;
-        BSTreeNode<T> replaceNode = null;
-
+        BSTreeNode<T> childNode = null;
+        BSTreeNode<T> deleteNode = null;
         if (treeNode.left == null || treeNode.right == null) {
-            delNode = treeNode;
+            deleteNode = treeNode;
         } else {
-            delNode = precursor(treeNode);
+            deleteNode = precursor(treeNode);
         }
 
-        if (delNode.left != null) {
-            replaceNode = delNode.left;
+        if (deleteNode.left != null) {
+            childNode = deleteNode.left;
         } else {
-            replaceNode = delNode.right;
+            childNode = deleteNode.right;
         }
 
-        if (replaceNode != null) {
-            replaceNode.parert = delNode.parert;
+        //开始替换树节点
+        if (deleteNode != null) {
+            childNode.parert = deleteNode.parert;
         }
 
-        if (replaceNode.parert == null) {
-            tree.mRoot = replaceNode;
-        } else if (delNode == delNode.parert.left) {
-            delNode.parert.left = replaceNode;
+        if (deleteNode.parert == null) {
+            tree.mRoot = childNode;
+        } else if (deleteNode == deleteNode.parert.left) {
+            deleteNode.parert.left = childNode;
         } else {
-            delNode.parert.right = replaceNode;
+            deleteNode.parert.right = childNode;
         }
 
-        if (delNode != treeNode) {
-            treeNode.key = delNode.key;
+        if (treeNode != deleteNode) {
+            treeNode.key = deleteNode.key;
         }
-        return delNode;
+        return deleteNode;
     }
 
+    public void remove(T key) {
+        BSTreeNode<T> removeNode = this.search(key);
+        if (removeNode != null) {
+            this.remove(this, removeNode);
+        }
+    }
+
+    /**
+     * 打印
+     *
+     * @param treeNode  当前节点的父节点
+     * @param direction 方向 -1 左子节点 0 根节点 1 右子节点
+     */
+    private void print(BSTreeNode<T> treeNode, int direction) {
+        if (treeNode != null) {
+            if (direction == 0) {
+                System.out.println(String.format("%s is root", treeNode.key));
+            } else {
+                System.out.println(String.format("%s is %s's %s child", treeNode.key, treeNode.parert.key, direction == 1 ? "right" : "left"));
+            }
+            print(treeNode.left, -1);
+            print(treeNode.right, 1);
+        }
+    }
+
+    public void print() {
+        if (mRoot != null) {
+            print(mRoot, 0);
+        }
+    }
+
+    /**
+     * 摧毁
+     *
+     * @param treeNode 树节点
+     */
+    private void destroy(BSTreeNode<T> treeNode) {
+        if (treeNode == null) {
+            return;
+        }
+        if (treeNode.left != null) {
+            destroy(treeNode.left);
+        }
+        if (treeNode.right != null) {
+            destroy(treeNode.right);
+        }
+        treeNode = null;
+    }
+
+    private void destroy() {
+        this.destroy(mRoot);
+        mRoot = null;
+    }
 }
