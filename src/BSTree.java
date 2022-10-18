@@ -250,33 +250,44 @@ public class BSTree<T extends Comparable<T>> {
     /**
      * 删除
      * 实际上是个替换的过程，把要删除的节点替换成真正删除的节点，
-     * 如果有左右节点，那么
+     *
      *
      * @param tree     树
      * @param treeNode 树节点
      * @return {@link BSTreeNode}<{@link T}>
      */
     private BSTreeNode<T> remove(BSTree<T> tree, BSTreeNode<T> treeNode) {
+        BSTreeNode<T> delNode = null;
         BSTreeNode<T> replaceNode = null;
 
-        if (treeNode.right != null && treeNode.left != null) {
-            replaceNode = precursor(treeNode);
+        if (treeNode.left == null || treeNode.right == null) {
+            delNode = treeNode;
+        } else {
+            delNode = precursor(treeNode);
         }
-        if (treeNode.left != null) {
-            replaceNode = treeNode.left;
-        }
-        if (treeNode.right != null) {
-            replaceNode = treeNode.right;
+
+        if (delNode.left != null) {
+            replaceNode = delNode.left;
+        } else {
+            replaceNode = delNode.right;
         }
 
         if (replaceNode != null) {
-            replaceNode.parert = treeNode.parert;
-        } else {
-            treeNode.parert = null;
+            replaceNode.parert = delNode.parert;
         }
 
+        if (replaceNode.parert == null) {
+            tree.mRoot = replaceNode;
+        } else if (delNode == delNode.parert.left) {
+            delNode.parert.left = replaceNode;
+        } else {
+            delNode.parert.right = replaceNode;
+        }
 
-        return null;
+        if (delNode != treeNode) {
+            treeNode.key = delNode.key;
+        }
+        return delNode;
     }
 
 }
