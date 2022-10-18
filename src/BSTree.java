@@ -339,7 +339,6 @@ public class BSTree<T extends Comparable<T>> {
     }
 
     public void remove(T key) {
-        BSTreeNode<T> z, node;
         BSTreeNode<T> removeNode = this.search(key);
         if (removeNode != null) {
             BSTreeNode<T> treeNode = this.remove(this, removeNode);
