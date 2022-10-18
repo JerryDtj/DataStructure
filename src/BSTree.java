@@ -28,21 +28,29 @@ public class BSTree<T extends Comparable<T>> {
         }
     }
 
+    public static void main(String[] args) {
+        System.out.println();
+    }
+
+    public void preOrder() {
+        this.preOrder(mRoot);
+    }
+
     /**
      * 前序遍历
      *
      * @param treeNode 树节点
      */
-    private void preOrder(BSTreeNode<T> treeNode){
-        if (treeNode!=null){
-            System.out.println(treeNode.key);
+    private void preOrder(BSTreeNode<T> treeNode) {
+        if (treeNode != null) {
+            System.out.print(treeNode.key + " ");
             preOrder(treeNode.left);
             preOrder(treeNode.right);
         }
     }
 
-    public void preOrder(){
-        this.preOrder(mRoot);
+    public void inOrder() {
+        this.inOrder(mRoot);
     }
 
     /**
@@ -50,27 +58,11 @@ public class BSTree<T extends Comparable<T>> {
      *
      * @param treeNode 树节点
      */
-    public void inOrder(BSTreeNode<T> treeNode){
-        if (treeNode!=null){
+    public void inOrder(BSTreeNode<T> treeNode) {
+        if (treeNode != null) {
             inOrder(treeNode.left);
-            System.out.println(treeNode.key);
+            System.out.print(treeNode.key + " ");
             inOrder(treeNode.right);
-        }
-    }
-
-    public void inOrder(){
-        this.inOrder(mRoot);
-    }
-
-    /**
-     * 后序遍历
-     * @param treeNode
-     */
-    public void postOrder(BSTreeNode<T> treeNode){
-        if (treeNode!=null){
-            inOrder(treeNode.left);
-            inOrder(treeNode.right);
-            System.out.println(treeNode.key);
         }
     }
 
@@ -108,22 +100,26 @@ public class BSTree<T extends Comparable<T>> {
      * @param treeNode 树节点
      * @return {@link BSTreeNode}<{@link T}>
      */
-    private BSTreeNode<T> max(BSTreeNode<T> treeNode){
-        if (treeNode==null){
+    private BSTreeNode<T> max(BSTreeNode<T> treeNode) {
+        if (treeNode == null) {
             return null;
         }
-        while (treeNode.right!=null){
+        while (treeNode.right != null) {
             treeNode = treeNode.right;
         }
         return treeNode;
     }
 
-    private T max(){
-        BSTreeNode<T> treeNode = this.max(mRoot);
-        if (treeNode!=null){
-            return treeNode.key;
-        }else {
-            return null;
+    /**
+     * 后序遍历
+     *
+     * @param treeNode
+     */
+    public void postOrder(BSTreeNode<T> treeNode) {
+        if (treeNode != null) {
+            inOrder(treeNode.left);
+            inOrder(treeNode.right);
+            System.out.print(treeNode.key + " ");
         }
     }
 
@@ -202,42 +198,16 @@ public class BSTree<T extends Comparable<T>> {
         return treeNode;
     }
 
-    public BSTreeNode<T> afterFlooding(){
+    public BSTreeNode<T> afterFlooding() {
         return this.precursor(mRoot);
     }
 
-    /**
-     * 插入
-     *
-     * @param bsTree     b树
-     * @param insertNode 插入节点
-     */
-    public void insert(BSTree<T> bsTree,BSTreeNode<T> insertNode){
-        int c = 0;
-        BSTreeNode<T> treeNode = bsTree.mRoot;
-        BSTreeNode<T> tempNode = null;
-
-        //找位置
-        while (treeNode!=null){
-            tempNode = treeNode;
-            c = treeNode.key.compareTo(insertNode.key);
-            if (c > 0) {
-                treeNode = treeNode.right;
-            } else {
-                treeNode = treeNode.left;
-            }
-        }
-
-        insertNode.parert = tempNode;
-        //插入
-        if (treeNode==null){
-            bsTree.mRoot = insertNode;
-        }else{
-            if (c>0){
-                tempNode.right = insertNode;
-            }else {
-                tempNode.left = insertNode;
-            }
+    public T max() {
+        BSTreeNode<T> treeNode = this.max(mRoot);
+        if (treeNode != null) {
+            return treeNode.key;
+        } else {
+            return null;
         }
     }
 
@@ -291,10 +261,38 @@ public class BSTree<T extends Comparable<T>> {
         return deleteNode;
     }
 
-    public void remove(T key) {
-        BSTreeNode<T> removeNode = this.search(key);
-        if (removeNode != null) {
-            this.remove(this, removeNode);
+    /**
+     * 插入
+     *
+     * @param bsTree     b树
+     * @param insertNode 插入节点
+     */
+    public void insert(BSTree<T> bsTree, BSTreeNode<T> insertNode) {
+        int c = 0;
+        BSTreeNode<T> treeNode = bsTree.mRoot;
+        BSTreeNode<T> tempNode = null;
+
+        //找位置
+        while (treeNode != null) {
+            tempNode = treeNode;
+            c = treeNode.key.compareTo(insertNode.key);
+            if (c < 0) {
+                treeNode = treeNode.right;
+            } else {
+                treeNode = treeNode.left;
+            }
+        }
+
+        insertNode.parert = tempNode;
+        //插入
+        if (tempNode == null) {
+            bsTree.mRoot = insertNode;
+        } else {
+            if (c < 0) {
+                tempNode.right = insertNode;
+            } else {
+                tempNode.left = insertNode;
+            }
         }
     }
 
@@ -340,7 +338,18 @@ public class BSTree<T extends Comparable<T>> {
         treeNode = null;
     }
 
-    private void destroy() {
+    public void remove(T key) {
+        BSTreeNode<T> z, node;
+        BSTreeNode<T> removeNode = this.search(key);
+        if (removeNode != null) {
+            BSTreeNode<T> treeNode = this.remove(this, removeNode);
+            if (treeNode != null) {
+                treeNode = null;
+            }
+        }
+    }
+
+    public void clearn() {
         this.destroy(mRoot);
         mRoot = null;
     }
