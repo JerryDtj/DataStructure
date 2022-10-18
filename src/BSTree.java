@@ -86,10 +86,10 @@ public class BSTree<T extends Comparable<T>> {
         }
         if (treeNode.key.compareTo(key)==0){
             return treeNode;
-        }else if (treeNode.key.compareTo(key)==1){
-            return this.search(key,treeNode.right);
-        }else {
+        }else if (treeNode.key.compareTo(key)>0){
             return this.search(key,treeNode.left);
+        }else {
+            return this.search(key,treeNode.right);
         }
     }
 
@@ -173,8 +173,8 @@ public class BSTree<T extends Comparable<T>> {
         return treeNode;
     }
 
-    public BSTreeNode<T> precursor() {
-        return this.precursor(mRoot);
+    public T precursor(T key) {
+        return this.precursor(search(key)).key;
     }
 
     /**

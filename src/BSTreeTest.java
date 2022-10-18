@@ -1,5 +1,5 @@
 public class BSTreeTest {
-    private static final int arr[] = {1, 5, 4, 3, 2, 6};
+    private static final int arr[] = {10,5,15,4,7,16,3,6};
 
     public static void main(String[] args) {
         int i, ilen;
@@ -27,8 +27,11 @@ public class BSTreeTest {
         System.out.println("== 树的详细信息: ");
         tree.print();
 
-        System.out.print("\n== 删除根节点: " + arr[3]);
-        tree.remove(arr[3]);
+        int pre = tree.precursor(5);
+        System.out.println("5的前驱为"+pre);
+
+        System.out.print("\n== 删除根节点: " + arr[0]);
+        tree.remove(arr[0]);
 
         System.out.print("\n== 中序遍历: ");
         tree.inOrder();
