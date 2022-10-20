@@ -77,23 +77,32 @@ public class AVLTree<T extends Comparable<T>> {
         return this.leftLeftRotating(k1);
     }
 
-    /*
-     * 将结点插入到AVL树中，并返回根节点
-     *
-     * 参数说明:
-     *     tree AVL树的根结点
-     *     key 插入的结点的键值
-     * 返回值:
-     *     根节点
-     */
     private AVLTreeNode<T> insert(AVLTreeNode<T> tree, T key) {
         if (tree == null) {
             tree = new AVLTreeNode<>(key, null, null);
         } else {
-//            key.compareTo()
+            if (key.compareTo(tree.key)>0){
+                //左子
+                tree.left = insert(tree,key);
+                if (height(tree.left)-height(tree.right)==2){
+                    if (key.compareTo(tree.left.key)>0) {
+                        leftLeftRotating(tree);
+                    }else{
+                        LeftRigthRotating(tree);
+                    }
+                }
+            }else if (key.compareTo(tree.key)<0){
+                if (key.compareTo(tree.right.key)>0) {
+                    rightRightRotating(tree);
+                }else{
+                    rigthLeftRotating(tree);
+                }
+            }else {
+                System.out.println("不能添加相同的节点");
+            }
         }
 
-        tree.height = tree.height + 1;
+        tree.height = max(height(tree.left),height(tree.right))+1;
         return tree;
     }
 
