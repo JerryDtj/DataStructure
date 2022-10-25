@@ -77,24 +77,46 @@ public class AVLTree<T extends Comparable<T>> {
         return this.leftLeftRotating(k1);
     }
 
-    /*
-     * 将结点插入到AVL树中，并返回根节点
-     *
-     * 参数说明:
-     *     tree AVL树的根结点
-     *     key 插入的结点的键值
-     * 返回值:
-     *     根节点
-     */
-    private AVLTreeNode<T> insert(AVLTreeNode<T> tree, T key) {
-        if (tree == null) {
-            tree = new AVLTreeNode<>(key, null, null);
-        } else {
-//            key.compareTo()
-        }
 
-        tree.height = tree.height + 1;
-        return tree;
+    /**
+     * 插入
+     *
+     * @param mRoot 根
+     * @param key   值
+     * @return {@link AVLTreeNode}<{@link T}> 根节点
+     */
+    private AVLTreeNode<T> insert(AVLTreeNode<T> mRoot, T key) {
+        if (mRoot == null) {
+            mRoot = new AVLTreeNode<>(key, null, null);
+        } else {
+            int p = mRoot.key.compareTo(key);
+            if (p < 0) {
+                //插入左边
+                AVLTreeNode left = this.insert(mRoot.left, key);
+                int height = height(left.left) - height(left.right);
+                if (height >= 2) {
+                    //左边比右边大，插入的是左边
+                    mRoot = leftLeftRotating(left);
+                } else if (height <= 2) {
+                    //左边比右边小，插入的是右边
+                    mRoot = leftLeftRotating(left);
+                }
+            } else {
+                //插入右边
+                AVLTreeNode right = this.insert(mRoot.right, key);
+                int height = height(right.left) - height(right.right);
+                if (height >= 2) {
+                    //左边比右边大，插入的是左边
+                    mRoot = rigthLeftRotating(right);
+                } else if (height <= 2) {
+                    //左边比右边小，插入的是右边
+                    mRoot = rightRightRotating(right);
+                }
+            }
+        }
+        mRoot.height = max(height(mRoot.left), height(mRoot.right)) + 1;
+
+        return mRoot;
     }
 
     public void insert(T key) {
