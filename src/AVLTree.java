@@ -81,41 +81,41 @@ public class AVLTree<T extends Comparable<T>> {
     /**
      * 插入
      *
-     * @param mRoot 根
-     * @param key   值
+     * @param treeNode 节点
+     * @param key      值
      * @return {@link AVLTreeNode}<{@link T}> 根节点
      */
-    private AVLTreeNode<T> insert(AVLTreeNode<T> mRoot, T key) {
-        if (mRoot == null) {
-            mRoot = new AVLTreeNode<>(key, null, null);
+    private AVLTreeNode<T> insert(AVLTreeNode<T> treeNode, T key) {
+        if (treeNode == null) {
+            treeNode = new AVLTreeNode<>(key, null, null);
         } else {
-            int p = mRoot.key.compareTo(key);
+            int p = treeNode.key.compareTo(key);
             if (p < 0) {
-                //插入左边
-                AVLTreeNode left = this.insert(mRoot.left, key);
-                int height = height(left.left) - height(left.right);
-                if (height >= 2) {
-                    //左边比右边大，插入的是左边
-                    mRoot = leftLeftRotating(left);
-                } else if (height <= 2) {
-                    //左边比右边小，插入的是右边
-                    mRoot = leftLeftRotating(left);
+                //插入左子树
+                treeNode.left = insert(treeNode.left, key);
+                if (height(treeNode.left) - height(treeNode.right) == 2) {
+                    //这里左子树肯定高于又子树
+                    if (key.compareTo(treeNode.key) < 0) {
+                        //插入的是左节点，直接用左左旋
+                        treeNode = leftLeftRotating(treeNode);
+                    } else {
+                        //插入的右节点，直接用左右旋
+                        treeNode = LeftRigthRotating(treeNode);
+                    }
                 }
-            } else {
-                //插入右边
-                AVLTreeNode right = this.insert(mRoot.right, key);
-                int height = height(right.left) - height(right.right);
-                if (height >= 2) {
-                    //左边比右边大，插入的是左边
-                    mRoot = rigthLeftRotating(right);
-                } else if (height <= 2) {
-                    //左边比右边小，插入的是右边
-                    mRoot = rightRightRotating(right);
+            } else if (p > 0) {
+                treeNode.right = insert(treeNode.right, key);
+                if (key.compareTo(treeNode.key) < 0) {
+                    //插入的是左节点，直接用右左旋
+                    treeNode = rigthLeftRotating(treeNode);
+                } else {
+                    treeNode = rightRightRotating(treeNode);
                 }
+            } else {    // cmp==0
+                System.out.println("添加失败: 不允许添加相同的节点！");
             }
         }
-        mRoot.height = max(height(mRoot.left), height(mRoot.right)) + 1;
-
+        mRoot.height = max(height(mRoot.left), height(mRoot.right))+1;
         return mRoot;
     }
 
